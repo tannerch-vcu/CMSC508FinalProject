@@ -1,2 +1,2 @@
-*CMSC 508
-**By: Christopher Tanner and Tyler Haden
+# CMSC 508
+## By: Christopher Tanner and Tyler Haden
