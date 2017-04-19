@@ -1,0 +1,7 @@
+Firstly
+Query lists
+	Diplay beers
+	Display all tables for refrence for professor
+	
+
+Ask professor what he wants to see on the site for the remote access stuff.
