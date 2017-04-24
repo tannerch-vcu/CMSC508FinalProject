@@ -45,8 +45,10 @@ Phone_Name varchar2(25));
 create table Sales(
 Provider_ID number(20) not Null, 
 Beer_ID number(20) not Null, 
-Start_Date_And_Time datetime not Null, 
-End_Date_And_Time datetime not Null, 
+Start_Date date not Null,
+Start_Time timestamp not Null,
+End_Date date not Null,
+End_Time timestamp not Null,
 Percentage_Change number(2,2) not Null,
 foreign key (Provider_ID) references Provider,
 foreign key (Beer_ID) references Beer);
@@ -57,25 +59,27 @@ Beer_ID number(20) not Null,
 Size_Sold number(8) not Null, 
 Quantity number(8) not Null, 
 Price number(4,2), 
-In_Stock boolean not Null, 
+In_Stock number(1) not Null, 
 primary key (Provider_ID,Beer_ID));
 
 create table Event(
 Event_ID number(20) not Null, 
 Location_ID number(20), 
-Start_Date_And_Time datetime, 
-End_Date_And_Time datetime, 
-primary key(Event_ID, Location_ID),
+Start_Date date not Null,
+Start_Time timestamp not Null,
+End_Date date not Null,
+End_Time timestamp not Null,
+primary key(Event_ID),
 foreign key (Location_ID) references Locations_List);
 
 create table Event_Beer(
 Event_ID number(20) not Null, 
 Provider_ID number(20) not Null, 
 Beer_ID number(20) not Null, 
-primary key(Event_ID, Provider_ID, Beer_ID),
 foreign key (Event_ID) references Event,
 foreign key (Provider_ID) references Provider,
-foreign key (Beer_ID) references Beer);
+foreign key (Beer_ID) references Beer,
+primary key(Event_ID, Provider_ID, Beer_ID));
 
 create table Users(
 Email varchar2(40) not Null, 
@@ -86,8 +90,8 @@ primary key(Email));
 create table Hours_Of_Operation(
 Provider_ID number(20) not Null, 
 Day_Of_The_Week number(7) not Null, 
-Open_Time datetime not Null, 
-Close_Time datetime not Null, 
+Open_Time timestamp not Null, 
+Close_Time timestamp not Null, 
 primary key (Provider_ID, Day_Of_The_Week));
 
 create table Favorite(
@@ -97,41 +101,43 @@ primary key(Email, Beer_ID));
 
 create table Transaction(
 Email varchar2(40) not Null, 
-Date_And_Time datetime not Null, 
+Transaction_Date date not Null,
+Transaction_Time timestamp not Null,
 Beer_ID number(20) not Null, 
 Size_Sold number(4) not Null, 
 Quantity number(4) not Null, 
 Provider_ID number(20) not Null, 
 Price number(6,2), 
-primary key(Email, Date_And_Time, Beer_ID, Size, Quantity),
+primary key(Email, Transaction_Date, Transaction_Time, Beer_ID, Size_Sold, Quantity),
 foreign key(Beer_ID) references Beer);
 
 create table Trial_Users(
 Email varchar2(40) not Null, 
-End_Date datetime not Null, 
+End_Date date not Null, 
 primary key(Email, End_Date),
 foreign key (Email) references Users);
 
 create table Pro_Users(
 Email varchar2(40) not Null, 
 Payment_Processor_Token varchar2(64) not Null, 
-Last_Payment_Date_And_Time datetime, 
-primary key(Email, Payment_Processor_Token, Last_Payment_Date_And_Time),
+Last_Payment_date date,
+Last_Payment_Time timestamp,
+primary key(Email, Payment_Processor_Token, Last_Payment_Date, Last_Payment_Time),
 foreign key(Email) references Users);
 
-drop table Pro_Users;
-drop table Trail_Users;
-drop table Transation;
-drop table Favorite;
-drop table Hours_Of_Operation;
-drop table Users;
-drop table Event_Beer;
-drop table Event;
-drop table Sells;
-drop table Sales;
-drop table Brewery_Phone;
-drop table Provider_Phone;
-drop table Provider;
-drop table Locations_List;
-drop table Beer;
-drop table Brewery;
+drop table Pro_Users cascade constraints;
+drop table Trial_Users cascade constraints;
+drop table Transaction cascade constraints;
+drop table Favorite cascade constraints;
+drop table Hours_Of_Operation cascade constraints;
+drop table Users cascade constraints;
+drop table Event_Beer cascade constraints;
+drop table Event cascade constraints;
+drop table Sells cascade constraints;
+drop table Sales cascade constraints;
+drop table Brewery_Phone cascade constraints;
+drop table Provider_Phone cascade constraints;
+drop table Provider cascade constraints;
+drop table Locations_List cascade constraints;
+drop table Beer cascade constraints;
+drop table Brewery cascade constraints;
