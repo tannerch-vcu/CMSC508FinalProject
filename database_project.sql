@@ -125,6 +125,8 @@ Last_Payment_Time timestamp,
 primary key(Email, Payment_Processor_Token, Last_Payment_Date, Last_Payment_Time),
 foreign key(Email) references Users);
 
+
+
 drop table Pro_Users cascade constraints;
 drop table Trial_Users cascade constraints;
 drop table Transaction cascade constraints;
