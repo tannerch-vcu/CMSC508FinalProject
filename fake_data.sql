@@ -86,7 +86,7 @@ insert into Event_Beer (Event_ID, Provider_ID, Beer_ID) values (2, 3, 6);
 -- /Event_Beer table
 
 -- Users table
-insert into Users (Email, User_Name, Password) values ('joe@joe.com', 'joejoejoe', 1234);
+insert into Users (Email, User_Name, Password) values ('joe@joe.com', 'joejoejoe', '1234a');
 insert into Users (Email, User_Name, Password) values ('user1@kmail.com', 'user2', 'password1');
 -- /Users table
 
