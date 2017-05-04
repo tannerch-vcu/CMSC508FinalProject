@@ -1,11 +1,11 @@
-create table States(
+create table B_States(
 State_Code varchar2(2) not Null,
 State_Name varchar2(25) not Null,
 primary key (State_Code));
 
-create table Countries(
+create table B_Countries(
 Country_Code varchar2(2) not Null,
-Country_Name varchar2(25) not Null,
+Country_Name varchar2(38) not Null,
 primary key (Country_Code));
 
 create table Brewery(
@@ -39,7 +39,7 @@ Address3 varchar2(25),
 City varchar2(25), 
 State_Code varchar2(2) references States, 
 Zip_Code varchar2(5), 
-Country_Code varchar2(2) references Countries,  
+Country_Code varchar2(2) references Countries,
 primary key (Location_ID),
 Constraint Location_Location_ID_low_end check (0<Location_ID));
 
