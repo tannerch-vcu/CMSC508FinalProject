@@ -5,7 +5,7 @@ increment by 1
 nocycle;
 
 create or replace view Beers as
-select be.beer_id, be.Beer_name, be.type, be.ABV, be.IBU, be.Color, br.brewery_name, br.brewery_ID from beer be join brewery br on (be.brewery_id = br.brewery_id);
+select be.beer_id, be.Beer_name, be.type, be.ABV, be.IBU, be.Color, be.brewery_ID from beer be;
 
 create or replace trigger New_Beer 
 instead of insert on Beers
