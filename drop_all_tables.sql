@@ -16,3 +16,9 @@ drop table Beer cascade constraints;
 drop table Brewery cascade constraints;
 drop table B_States cascade constraints;
 drop table B_countries cascade constraints;
+
+drop sequence Brewery_ID_seq;
+drop sequence Beer_ID_seq;
+drop sequence Event_ID_seq;
+drop sequence Location_ID_seq;
+drop sequence Provider_ID_seq;
