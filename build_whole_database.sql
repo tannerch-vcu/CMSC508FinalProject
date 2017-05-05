@@ -1,3 +1,282 @@
+-- clears these if they exist, would run into conflicts otherwise
+drop table Pro_Users cascade constraints;
+drop table Trial_Users cascade constraints;
+drop table Transaction cascade constraints;
+drop table Favorite cascade constraints;
+drop table Hours_Of_Operation cascade constraints;
+drop table Users cascade constraints;
+drop table Event_Beer cascade constraints;
+drop table Event cascade constraints;
+drop table Sells cascade constraints;
+drop table Sales cascade constraints;
+drop table Brewery_Phone cascade constraints;
+drop table Provider_Phone cascade constraints;
+drop table Provider cascade constraints;
+drop table Locations_List cascade constraints;
+drop table Beer cascade constraints;
+drop table Brewery cascade constraints;
+drop table B_States cascade constraints;
+drop table B_countries cascade constraints;
+
+drop sequence Brewery_ID_seq;
+drop sequence Beer_ID_seq;
+drop sequence Event_ID_seq;
+drop sequence Location_ID_seq;
+drop sequence Provider_ID_seq;
+
+-- begin creating tables
+create table B_States(
+State_Code varchar2(2) not Null,
+State_Name varchar2(40) not Null,
+primary key (State_Code));
+
+create table B_Countries(
+Country_Code varchar2(2) not Null,
+Country_Name varchar2(40) not Null,
+primary key (Country_Code));
+
+create table Brewery(
+Brewery_ID number(20) not Null,
+Brewery_Name varchar2(25) not Null,
+primary key (Brewery_ID),
+Constraint Brewery_Brewery_ID_low_end check (0<Brewery_ID));
+
+create table Beer(
+Beer_ID number(20) not Null,
+Beer_Name varchar2(25) not Null,
+Type varchar2(25),
+ABV number(2,2),
+IBU number(4),
+Color varchar2(25),
+Brewery_ID number(20) not Null,
+primary key(Beer_ID),
+foreign key(Brewery_ID) references Brewery,
+Constraint ABV_check_low_end check (0<=ABV),
+Constraint ABV_check_high_end check (ABV<=100),
+Constraint IBU_check_low_end check (0<=IBU),
+Constraint IBU_check_high_end check (IBU<=100),
+Constraint Beer_Beer_ID_low_end check (0<Beer_ID),
+Constraint Beer_Brewery_ID_low_end check (0<Brewery_ID));
+
+create table Locations_List(
+Location_ID number(20) not Null,
+Address1 varchar2(25),
+Address2 varchar2(25),
+Address3 varchar2(25),
+City varchar2(25),
+State_Code varchar2(2) references B_States,
+Zip_Code varchar2(5),
+Country_Code varchar2(2) references B_Countries,
+primary key (Location_ID),
+Constraint Location_Location_ID_low_end check (0<Location_ID));
+
+create table Provider(
+Provider_ID number(20) not Null,
+Provider_Name varchar2(25),
+Location_ID number(20),
+primary key (Provider_ID),
+foreign key (Location_ID) references Locations_List,
+Constraint Provider_Provider_ID_low_end check (0<Provider_ID),
+Constraint PRovider_Location_ID_low_end check (0<Location_ID));
+
+create table Provider_Phone(
+Provider_ID number(20) not Null,
+Phone_Number varchar2(11) not Null,
+Phone_Name varchar2(25),
+Constraint P_Phone_Provider_ID_low_end check (0<Provider_ID));
+
+create table Brewery_Phone(
+Brewery_ID number(20) not Null,
+Phone_Number varchar2(11) not Null,
+Phone_Name varchar2(25),
+Constraint B_Phone_Brewery_ID_low_end check (0<Brewery_ID));
+
+create table Sales(
+Provider_ID number(20) not Null,
+Beer_ID number(20) not Null,
+Start_Date date not Null,
+End_Date date not Null,
+Percentage_Change number(2,2) not Null,
+foreign key (Provider_ID) references Provider,
+foreign key (Beer_ID) references Beer,
+Constraint Percent_Change_low_end check (-100<=Beer_ID),
+Constraint Percent_Change_high_end check (Beer_ID<=100));
+
+create table Sells(
+Provider_ID number(20) not Null,
+Beer_ID number(20) not Null,
+Size_Sold number(8) not Null,
+Quantity number(8) not Null,
+Price number(4,2),
+In_Stock number(1) not Null,
+primary key (Provider_ID,Beer_ID),
+Constraint Sells_Provider_ID_low_end check (0<Provider_ID),
+Constraint Sells_Beer_ID_low_end check (0<Beer_ID),
+Constraint Size_Sold_low_end check (0<=Size_Sold),
+Constraint Size_Sold_high_end check (1000>=Size_Sold),
+Constraint Quantity_low_end check (0<=Quantity),
+Constraint Quantity_high_end check (1000>=Quantity),
+Constraint Price_low_end check (0<=Price),
+Constraint Price_high_end check (1000>=Price));
+
+create table Event(
+Event_ID number(20) not Null,
+Location_ID number(20),
+Start_Date date not Null,
+End_Date date not Null,
+primary key(Event_ID),
+foreign key (Location_ID) references Locations_List,
+Constraint Event_Event_ID_low_end check (0<Event_ID),
+Constraint Event_Location_ID_low_end check (0<Location_ID));
+
+create table Event_Beer(
+Event_ID number(20) not Null,
+Provider_ID number(20) not Null,
+Beer_ID number(20) not Null,
+foreign key (Event_ID) references Event,
+foreign key (Provider_ID) references Provider,
+foreign key (Beer_ID) references Beer,
+primary key(Event_ID, Provider_ID, Beer_ID),
+Constraint Event_Beer_Event_ID_low_end check (0<Event_ID),
+Constraint Event_Beer_Provider_ID_low_end check (0<Provider_ID),
+Constraint Event_Beer_Beer_ID_low_end check (0<Beer_ID));
+
+create table Users(
+Email varchar2(40) not Null,
+User_Name varchar2(40) not Null,
+Password varchar2(64) not Null,
+primary key(Email));
+
+create table Hours_Of_Operation(
+Provider_ID number(20) not Null,
+Day_Of_The_Week number(7) not Null,
+Open_Time timestamp not Null,
+Close_Time timestamp not Null,
+primary key (Provider_ID, Day_Of_The_Week),
+Constraint H_O_O_Provider_ID_low_end check (0<Provider_ID),
+Constraint Day_Of_The_Week_low_end check (1<=Day_Of_The_Week),
+Constraint Day_Of_The_Week_high_end check (7>=Day_Of_The_Week));
+
+create table Favorite(
+Email varchar2(40) not Null,
+Beer_ID number(20) not Null,
+primary key(Email, Beer_ID),
+Constraint Favorite_Beer_ID_low_end check (0<Beer_ID));
+
+create table Transaction(
+Email varchar2(40) not Null,
+Transaction_Date date not Null,
+Beer_ID number(20) not Null,
+Size_Sold number(4) not Null,
+Quantity number(4) not Null,
+Provider_ID number(20) not Null,
+Price number(6,2),
+primary key(Email, Transaction_Date, Beer_ID, Size_Sold, Quantity),
+foreign key(Beer_ID) references Beer,
+Constraint Tr_Beer_ID_low_end check (0<Beer_ID),
+Constraint Tr_Provider_ID_low_end check (0<Provider_ID),
+Constraint Tr_Size_Sold_low_end check (0<=Size_Sold),
+Constraint Tr_Size_Sold_high_end check (1000>=Size_Sold),
+Constraint Tr_Quantity_low_end check (0<=Quantity),
+Constraint Tr_Quantity_high_end check (1000>=Quantity),
+Constraint Tr_Price_low_end check (0<=Price),
+Constraint Tr_Price_high_end check (1000>=Price));
+
+create table Trial_Users(
+Email varchar2(40) not Null,
+End_Date date not Null,
+primary key(Email, End_Date),
+foreign key (Email) references Users);
+
+create table Pro_Users(
+Email varchar2(40) not Null,
+Payment_Processor_Token varchar2(64) not Null,
+Last_Payment_date date,
+primary key(Email, Payment_Processor_Token, Last_Payment_Date),
+foreign key(Email) references Users);
+
+-- begin creating sequences, views, and triggers
+create sequence Beer_ID_seq
+start with 1
+maxvalue 1000000000000
+increment by 1
+nocycle;
+
+create or replace view Beers as
+select be.beer_id, be.Beer_name, be.type, be.ABV, be.IBU, be.Color, be.brewery_ID from beer be;
+
+create or replace trigger New_Beer
+instead of insert on Beers
+Begin
+insert into beer (Beer_ID, Beer_Name, Type, ABV, IBU, Color, Brewery_ID) values (Beer_ID_seq.nextval, :new.Beer_Name, :new.type, :new.ABV, :new.IBU, :new.Color, :new.Brewery_ID);
+END;
+/
+create sequence Brewery_ID_seq
+start with 1
+maxvalue 1000000000000
+increment by 1
+nocycle;
+
+create or replace view Breweries as
+select brewery_id, brewery_name from brewery;
+
+create or replace trigger New_Brewery
+instead of insert on Breweries
+Begin
+insert into brewery (Brewery_ID, Brewery_Name) values (Brewery_ID_seq.nextval, :new.Brewery_Name);
+END;
+/
+create sequence Event_ID_seq
+start with 1
+maxvalue 1000000000000
+increment by 1
+nocycle;
+
+create or replace view Events as
+select Event_id, Location_id, Start_date, End_date from Event;
+
+
+create or replace trigger New_Event
+instead of insert on Events
+Begin
+insert into event (Event_id, Location_id, Start_date, End_date) values (Event_ID_seq.nextval, :new.location_id, :new.start_date, :new.end_date);
+END;
+/
+create sequence Location_ID_seq
+start with 1
+maxvalue 1000000000000
+increment by 1
+nocycle;
+
+
+create or replace view b_Locations as
+select location_id, address1, address2, address3, city, state_code, zip_code, country_code from locations_list;
+
+
+create or replace trigger New_Location
+instead of insert on b_Locations
+Begin
+insert into locations_list (Location_ID, address1, address2, address3, city, state_code, zip_code, country_code) values (Location_ID_seq.nextval, :new.address1, :new.address2, :new.address3, :new.city, :new.state_code, :new.zip_code, :new.country_code);
+END;
+/
+create sequence Provider_ID_seq
+start with 1
+maxvalue 1000000000000
+increment by 1
+nocycle;
+
+create or replace view Providers as
+select provider_id, provider_name, location_id from provider;
+
+
+create or replace trigger New_Provider
+instead of insert on providers
+Begin
+insert into provider (Provider_ID, Provider_Name, Location_id) values (Provider_ID_seq.nextval, :new.Provider_Name, :new.location_id);
+END;
+/
+
+-- begin filling in data
 -- b_states
 insert into b_states values ('AL','Alabama');
 insert into b_states values ('AK','Alaska');
@@ -306,39 +585,39 @@ insert into b_countries values ('ZR', 'Zaire');
 insert into b_countries values ('ZM', 'Zambia');
 insert into b_countries values ('ZW', 'Zimbabwe');
 
--- Brewery table
-insert into Brewery values (1, 'Dogwood');
-insert into Brewery values (2, 'Milwakee');
-insert into Brewery values (3, 'Budweighser');
-insert into Brewery values (4, 'Flying Dog');
-insert into Brewery values (5, 'Fish Dog');
-insert into Brewery values (6, 'Center Of The Galaxy');
--- /Brewery table
+-- breweries table
+insert into breweries values (null, 'Dogwood');
+insert into breweries values (null, 'Milwakee');
+insert into breweries values (null, 'Budweighser');
+insert into breweries values (null, 'Flying Dog');
+insert into breweries values (null, 'Fish Dog');
+insert into breweries values (null, 'Center Of The Galaxy');
+-- /breweries table
 
--- Beer table
-insert into Beer values (1, 'PBR', 'Pilsner', 0.71, 7, 'Red', 4);
-insert into Beer values (2, 'Warm Beer', 'Pilsner', 0.54, 43, 'Brown', 5);
-insert into Beer values (3, 'Pizza Beer', 'Ale', 0.24, 44, 'Yellow', 3);
-insert into Beer values (4, 'Sunset', 'Porter', 0.08, 63, 'Golden', 1);
-insert into Beer values (5, 'Monkey Beer', 'Red Ale', 0.66, 4, 'Red', 4);
-insert into Beer values (6, '90 Minute IPA', 'IPA', 0.55, 41, 'Maroon', 3);
-insert into Beer values (7, '120 Minute IPA', 'IPA', 0.08, 21, 'Maroon', 3);
-insert into Beer values (8, 'Numero Uno', 'Lager', 0.62, 45, 'Pale', 3);
-insert into Beer values (9, 'Apple Cider', 'Cider', 0.54, 34, 'Red', 6);
-insert into Beer values (10, 'Green Apple Cider', 'Cider', 0.51, 96, 'Green', 6);
--- /Beer table
+-- beers table
+insert into beers values (null, 'PBR', 'Pilsner', 0.71, 7, 'Red', 4);
+insert into beers values (null, 'Warm Beer', 'Pilsner', 0.54, 43, 'Brown', 5);
+insert into beers values (null, 'Pizza Beer', 'Ale', 0.24, 44, 'Yellow', 3);
+insert into beers values (null, 'Sunset', 'Porter', 0.08, 63, 'Golden', 1);
+insert into beers values (null, 'Monkey Beer', 'Red Ale', 0.66, 4, 'Red', 4);
+insert into beers values (null, '90 Minute IPA', 'IPA', 0.55, 41, 'Maroon', 3);
+insert into beers values (null, '120 Minute IPA', 'IPA', 0.08, 21, 'Maroon', 3);
+insert into beers values (null, 'Numero Uno', 'Lager', 0.62, 45, 'Pale', 3);
+insert into beers values (null, 'Apple Cider', 'Cider', 0.54, 34, 'Red', 6);
+insert into beers values (null, 'Green Apple Cider', 'Cider', 0.51, 96, 'Green', 6);
+-- /beers table
 
--- Locations_List table
-insert into Locations_List values (1, '777 Main Street', '', '', 'Richmond', 'VA', 23220, 'US');
-insert into Locations_List values (2, '123 Maple Road', '', '', 'Chapel Hill', 'NC', 43223, 'US');
-insert into Locations_List values (3, '543 Pine Tree Street', '', '', 'Richmond', 'VA', 23220, 'US');
--- /Locations_List table
+-- b_locations table
+insert into b_locations values (null, '777 Main Street', '', '', 'Richmond', 'VA', 23220, 'US');
+insert into b_locations values (null, '123 Maple Road', '', '', 'Chapel Hill', 'NC', 43223, 'US');
+insert into b_locations values (null, '543 Pine Tree Street', '', '', 'Richmond', 'VA', 23220, 'US');
+-- /b_locations table
 
--- Provider table
-insert into Provider values (1, 'Johnson Store', 1);
-insert into Provider values (2, 'Pickle Farm', 2);
-insert into Provider values (3, 'Kroger', 3);
--- /Provider table
+-- providers table
+insert into providers values (null, 'Johnson Store', 1);
+insert into providers values (null, 'Pickle Farm', 2);
+insert into providers values (null, 'Kroger', 3);
+-- /providers table
 
 -- Provider_Phone table
 insert into Provider_Phone values (1, '8041231234', 'Office');
@@ -381,10 +660,10 @@ insert into Sells values (3, 4, 16, 23, 12.4, 0);
 insert into Sells values (3, 6, 21, 9, 9.5, 1);
 -- /Sells table
 
--- Event table
-insert into Event values (1, 1, to_date('2003/05/03 10:00:10', 'yyyy/mm/dd hh24:mi:ss'), to_date('2003/05/03 16:00:10', 'yyyy/mm/dd hh24:mi:ss'));
-insert into Event values (2, 2, to_date('2004/05/03 10:00:10', 'yyyy/mm/dd hh24:mi:ss'), to_date('2004/05/03 16:00:10', 'yyyy/mm/dd hh24:mi:ss'));
--- /Event table
+-- events table
+insert into events values (null, 1, to_date('2003/05/03 10:00:10', 'yyyy/mm/dd hh24:mi:ss'), to_date('2003/05/03 16:00:10', 'yyyy/mm/dd hh24:mi:ss'));
+insert into events values (null, 2, to_date('2004/05/03 10:00:10', 'yyyy/mm/dd hh24:mi:ss'), to_date('2004/05/03 16:00:10', 'yyyy/mm/dd hh24:mi:ss'));
+-- /events table
 
 -- Event_Beer table
 insert into Event_Beer values (1, 1, 1);
@@ -394,8 +673,8 @@ insert into Event_Beer values (2, 3, 6);
 -- /Event_Beer table
 
 -- Users table
-insert into Users values ('joe@joe.com', 'joejoejoe', '1234a');
-insert into Users values ('user1@kmail.com', 'user2', 'password1');
+insert into Users values ('joe@joe.com', 'joejoejoe', 'f0e4c2f76c58916ec258f246851bea091d14d4247a2fc3e18694461b1816e13b');
+insert into Users values ('user1@kmail.com', 'user2', 'f6f2ea8f45d8a057c9566a33f99474da2e5c6a6604d736121650e2730c6fb0a3');
 -- /Users table
 
 -- Favorite table
@@ -422,3 +701,12 @@ insert into Trial_Users values ('joe@joe.com', to_date('2012/08/03 16:00:10', 'y
 insert into Pro_Users values ('user1@kmail.com', 'wa8444nyco9m', to_date('2016/01/03 16:00:10', 'yyyy/mm/dd hh24:mi:ss'));
 -- /Pro_Users table
 
+-- Hours_Of_Operation table
+insert into hours_of_operation values (1, 3, to_timestamp('01:00:00', 'HH24:MI:SS'), to_timestamp('13:00:00', 'HH24:MI:SS'));
+insert into hours_of_operation values (1, 4, to_timestamp('01:00:00', 'HH24:MI:SS'), to_timestamp('13:00:00', 'HH24:MI:SS'));
+insert into hours_of_operation values (1, 5, to_timestamp('01:00:00', 'HH24:MI:SS'), to_timestamp('13:00:00', 'HH24:MI:SS'));
+-- /Hours_Of_Operation table
+
+
+-- commit
+commit;
