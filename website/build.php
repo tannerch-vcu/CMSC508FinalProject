@@ -80,22 +80,32 @@ function build_sidenav($tables, $root){
   return $output;
 }
 
-function build_table($stid){
+function build_table($stid, $root){
   $output = "<thead>\n<tr>\n";
   
   for ($i = 1; $i <= oci_num_fields($stid); $i++) {
     $name = oci_field_name($stid, $i);
     $output .= "<td>" . $name . "</td>\n";
   }
-  
+  $output .= "<td>Delete</td>";
   $output .= "</tr>\n</thead>\n<tbody>";
   
   while ($row = oci_fetch_array($stid, OCI_ASSOC+OCI_RETURN_NULLS)) {
     $output .= "<tr>\n";
+    $bools = true;
+    $temp = '';
     foreach ($row as $item) {
+      if($bools){
+        $temp = $item;
+        $bools = false;
+      }
       $output .= "<td>" . ($item !== null ? htmlentities($item, ENT_QUOTES) : "&nbsp;") . "</td>\n";
     }
-    $output .= "</tr>\n";
+    
+    $output .= "<td><form action='index.php?" . $root . "' method='post'>
+    <input type='hidden' value='" . $temp . "' name='delete'>
+      <input type='hidden' name='best_proffessor_ever' value='Dr.Cano' />
+    <input style='width:100%;height:100%;' type='submit' value='Delete'/></form></td></tr>\n";
   }
   
   $output .= "</tbody>";
@@ -107,7 +117,7 @@ function build_page($current_table, $stid, $tables, $root, $post_response){
   $default_page = $root . "?" . $tables[0];
   $sidenav_html = build_sidenav($tables, $root);
   $form_html = build_form($current_table, $root);
-  $table_html = build_table($stid);
+  $table_html = build_table($stid, $current_table);
   
   print('<!DOCTYPE html>
 <html lang="en">

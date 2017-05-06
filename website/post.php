@@ -134,9 +134,21 @@ function further_process($keys, $types, $values, $table){
   return $extra;
 }
 
+function special($p, $t){
+  if(!preg_match('/^[\w]*$/', $p['delete'])){
+          return 'Delete is incorrect.';
+        }
+        return 'Delete '.$p['delete'].' from '.$t; //.perform_query('delete ');
+  
+}
+
 function process_post($post_parameters, $table){
   if(!$post_parameters['best_proffessor_ever'] or $post_parameters['best_proffessor_ever'] !== 'Dr.Cano'){
     return 'Don\'t mess with Dr.Cano';
+  }
+  
+  if(array_key_exists('delete', $post_parameters)){
+    return special($post_parameters, $table);
   }
   
   $accepted_tables_p = accepted_tables();
