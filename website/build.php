@@ -22,13 +22,19 @@ function type_conv($type){
   }
 }
 
+function login_form(){
+  return '<br /><br /><form style="background:#d9d9d9;" action="login.php" onsubmit="pass_handler(\'pass_id_login\');" method="post">
+  Email: <input type="text" name="email"/> Password: <input id="pass_id_login" type="password" name="hash"/>
+  <input type="submit" value="LOGIN" />
+  </form>';
+}
+
 function parse_for_form($table, $root, $keys, $types){
   if(in_array('pass', $types)){
-    $output = '<form action="' . $root . '?' . $table . '" method="post" onsubmit="pass_handler();">';
+    $output = '<form action="' . $root . '?' . $table . '" method="post" onsubmit="pass_handler(pass_id);">';
   } else {
     $output = '<form action="' . $root . '?' . $table . '" method="post" >';
   }
-  
   
   $disabled_id = array_key_exists($table, views());
   
@@ -44,6 +50,10 @@ function parse_for_form($table, $root, $keys, $types){
   $output .= '  <input type="hidden" name="best_proffessor_ever" value="Dr.Cano" />';
   $output .= '  <input type="submit" value="INSERT" />';
   $output .= '</form>';
+  
+  if($table == 'users'){
+    $output .= login_form();
+  }
   
   return $output;
 }
@@ -107,8 +117,8 @@ function build_page($current_table, $stid, $tables, $root, $post_response){
     <!-- Bootstrap Core CSS --><link href="css/bootstrap.min.css" rel="stylesheet"><!-- Custom CSS --><link href="css/sb-admin.css" rel="stylesheet"><!-- Custom Fonts --><link href="font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css"><!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries --><!-- WARNING: Respond.js doesn\'t work if you view the page via file:// --><!--[if lt IE 9]><script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script><script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script><![endif]--><link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon"><link rel="icon" href="images/favicon.ico" type="image/x-icon">
     <script src="js/sha.js"></script>
     <script type="text/javascript">
-function pass_handler(){
-  var pass_element = document.getElementById("pass_id");
+function pass_handler(password_id){
+  var pass_element = document.getElementById(password_id);
   if (pass_element.value != "" || 1 == 1){
     var sha256 = new jsSHA("SHA-256", "TEXT");
     sha256.update(pass_element.value);

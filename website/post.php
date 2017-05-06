@@ -12,15 +12,15 @@ function perform_query($q){
   } else {
     // connection was successful
     $stid = oci_parse($conn, $q); 
-    oci_execute($stid);
-    
-    $stid2 = oci_parse($conn, 'commit'); 
-    oci_execute($stid2);
-   
-    // close the Oracle connection
+    if(oci_execute($stid)){
+      $stid2 = oci_parse($conn, 'commit'); 
+      if(oci_execute($stid2)){
+        oci_close($conn);
+        return '<br />SUCCESS';
+      }
+    }
     oci_close($conn);
-    
-    return '<br />SUCCESS';
+    return '<br />NOT SUCCESSFUL';
   }
 }
 
