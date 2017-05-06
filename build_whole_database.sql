@@ -276,6 +276,24 @@ insert into provider (Provider_ID, Provider_Name, Location_id) values (Provider_
 END;
 /
 
+create or replace function password_manager (
+  hash_input in users.password%TYPE,
+  email_input in users.email%TYPE)
+     return varchar2
+is
+     hash_expected users.password%TYPE;
+begin
+     select password into hash_expected
+     from users
+     where email = email_input;
+     if hash_expected = hash_input then
+         return 'TRUE';
+     else
+         return 'FALSE';
+     end if;
+end password_manager;
+/
+
 -- begin filling in data
 -- b_states
 insert into b_states values ('AL','Alabama');
