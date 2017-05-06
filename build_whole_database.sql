@@ -160,6 +160,7 @@ Constraint Day_Of_The_Week_high_end check (7>=Day_Of_The_Week));
 create table Favorite(
 Email varchar2(40) not Null,
 Beer_ID number(20) not Null,
+foreign key (Email) references Users,
 primary key(Email, Beer_ID),
 Constraint Favorite_Beer_ID_low_end check (0<Beer_ID));
 
